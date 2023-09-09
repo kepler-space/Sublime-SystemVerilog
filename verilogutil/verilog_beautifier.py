@@ -26,7 +26,7 @@ def split_on_comma(txt) :
 #
 class VerilogBeautifier():
 
-    def __init__(self, nbSpace=3, useTab=False, oneBindPerLine=True, oneDeclPerLine=False, paramOneLine=True, indentSyle='1tbs', reindentOnly=False, stripEmptyLine=True, instAlignPort=True, ignoreTick=True,importSameLine=False,alignComma=True,alignEndComma=False):
+    def __init__(self, nbSpace=3, useTab=False, oneBindPerLine=True, oneDeclPerLine=False, paramOneLine=True, indentSyle='1tbs', reindentOnly=False, stripEmptyLine=True, instAlignPort=True, ignoreTick=True,importSameLine=False,alignComma=True,alignEndComma=False, numSpacesPeforeBracket=1):
         self.settings = {'nbSpace': nbSpace,
                         'useTab':useTab,
                         'oneBindPerLine':oneBindPerLine,
@@ -40,6 +40,7 @@ class VerilogBeautifier():
                         'ignoreTick' : ignoreTick,
                         'alignComma' : alignComma,
                         'alignEndComma' : alignEndComma,
+						'numSpacesPeforeBracket' : numSpacesPeforeBracket,
         }
         self.indentSpace = ' ' * nbSpace
         if useTab:
@@ -489,10 +490,10 @@ class VerilogBeautifier():
         if not self.settings['alignEndComma']:
             new_lines=[]
             for line in txt_new.split('\n'):
-                new_line=line
-                if (line.rstrip())[-1] in "\,;":
-                    new_line = line.rstrip()
-                    new_line = new_line[:-1].rstrip() + new_line[-1]
+                new_line=line.rstrip()
+                if len(new_line) > 0 :
+                    if new_line[-1] in "\,;":
+                        new_line = new_line[:-1].rstrip() + new_line[-1]
                 new_lines.append(new_line)
             txt_new = '\n'.join(new_lines)    
         return txt_new
@@ -1066,7 +1067,7 @@ class VerilogBeautifier():
                     txt_new += self.indent*(ilvl)
                     txt_new += '.' + m.group('port').ljust(max_port_len)
                     if 'signal' in m.groupdict():
-                        txt_new += '(' + m.group('signal').strip().ljust(max_sig_len)
+                        txt_new += self.settings['numSpacesPeforeBracket']*' ' + '(' + m.group('signal').strip().ljust(max_sig_len)
                     elif max_sig_len>0 and i!=(len(lines)-1):
                         txt_new += ''.ljust(max_sig_len+2) # 2 is for the parenthesis ()
                     if not is_split:
